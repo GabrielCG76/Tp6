@@ -1,0 +1,7 @@
+from enum import Enum
+
+class Game_State(Enum):
+    Pas_démarrer= 0
+    Ronde_fini= 1
+    Jeu_fini= 2
+    Ronde_active= 3
