@@ -1,0 +1,200 @@
+# Gabriel Claude-Giroux, 405
+#jeu de roche, papier, ciseaux 
+
+
+import random
+
+import arcade
+
+
+#animations d’attaque 
+from game_state import Game_State
+
+SCREEN_WIDTH = 1024
+SCREEN_HEIGHT = 600
+SCREEN_TITLE = "Roche papier ciseaux"
+DEFAULT_LINE_HEIGHT = 45 
+
+
+class MyGame(arcade.Window):
+   
+   #La classe principale de l'application
+
+   PLAYER_IMAGE_X = (SCREEN_WIDTH / 2) - (SCREEN_WIDTH / 4)
+   PLAYER_IMAGE_Y = SCREEN_HEIGHT / 2.5
+   COMPUTER_IMAGE_X = (SCREEN_WIDTH / 2) * 1.5
+   COMPUTER_IMAGE_Y = SCREEN_HEIGHT / 2.5
+   ATTACK_FRAME_WIDTH = 154 / 2
+   ATTACK_FRAME_HEIGHT = 154 / 2
+
+   def __init__(self, width, height, title):
+       super().__init__(width, height, title)
+
+       arcade.set_background_color(arcade.color.BLACK)
+
+       self.player = None
+       self.computer = None
+       self.players = None
+       self.rock = None
+       self.paper = None
+       self.scissors = None
+       self.player_score = 0
+       self.computer_score = 0
+       self.player_attack_type = {}
+       self.computer_attack_type = None
+       self.player_attack_chosen = False
+       self.player_won_round = None
+       self.draw_round = None
+       self.game_state = game_state.NOT_STARTED
+
+   def setup(self):
+        #Configuration des variables 
+        # on va créer nos listes de sprites 
+      
+
+       self.game_state = Game_State.NOT_STARTED
+
+       self.computer_score = 0
+       self.player_score = 0
+
+       self.player = arcade.Sprite(':assets/faceBeard.png', 1)
+       self.player.center_x = 300
+       self.player.center_y = 600
+
+       self.computer = arcade.Sprite(':assets/compy.png', 1)
+       self.computer.center_x = 500
+       self.computer.center_y = 800
+
+       self.roche = attack_animation(attack_type.ROCHE, center_x = 600, center_y = 200)
+       self.papier = attack_animation(attack_type.PAPIER, center_x = 300, center_y = 200)
+       self.ciseaux = attack_animation(attack_type.CISEAUX, center_x = 100, center_y = 200)
+
+       self.players = arcade.SpriteList()
+
+       self.players.append(self.player)
+       self.players.append(self.computer)
+
+       self.players.draw()
+
+
+
+   def validate_victory(self):
+      
+#ça défini qui a gagner ou s’il a une égalité 
+              if self.player_attack_type == 0 and self.computer_attack_type == 1:
+           print("l’ordi a gagné ")
+           self.computer_score += 1
+
+       if self.player_attack_type == 1 and self.computer_attack_type == 2:
+           print("l’ordi a gagné!")
+           self.computer_score += 1
+
+       if self.player_attack_type == 2 and self.computer_attack_type == 0:
+           print("l’ordi a gagné!")
+           self.computer_score += 1
+
+       if self.player_attack_type == 0 and self.computer_attack_type == 2:
+           print("tu as gagné!")
+           self.player_score += 1
+
+       if self.player_attack_type == 1 and self.computer_attack_type == 0:
+           print("tu as gagné!")
+           self.player_score += 1
+
+       if self.player_attack_type == 2 and self.computer_attack_type == 1:
+           print("tu as gagné!")
+           self.player_score += 1
+
+       if self.player_attack_type == 0 and self.computer_attack_type == 0:
+           print(“Égalité!")
+
+       if self.player_attack_type == 1 and self.computer_attack_type == 1:
+           print(“Égalité!")
+
+       if self.player_attack_type == 2 and self.computer_attack_type == 2:
+           print(" Égalité!")
+
+   def draw_possible_attack(self):
+  #on dessine tout les possibilités d’attaques 
+              pass
+   def draw_computer_attack(self):
+#on dessine ce que l’ordi choisi 
+              pass
+
+
+   def draw_scores(self):
+#on montre les scores de nous et l’ordi
+       pass
+
+   def draw_instructions(self):
+#on inscrit les instructions pour que le joueur joue 
+           pass
+
+   def on_draw(self):
+#arcade ajoute des éléments au jeu
+
+  
+       arcade.start_render()
+       arcade.set_background_color(arcade.color.GRAY)
+#titre 
+       if self.game_state == Game_State.NOT_STARTED:
+           arcade.draw_text(SCREEN_TITLE,
+                        0,
+                        SCREEN_HEIGHT - DEFAULT_LINE_HEIGHT * 2,
+                        arcade.color.BLACK_BEAN,
+                        60,
+                        width=SCREEN_WIDTH,
+                        align="center")
+
+       self.draw_instructions()
+       self.players.draw()
+       self.draw_possible_attack()
+       self.draw_scores()
+
+       
+       if self.game_state == Game_State.ROUND_ACTIVE:
+           arcade.draw_text('APPUYEZ SUR UNE IMAGE POUR FAIRE UNE ATTAQUE', 90, 470, arcade.color.BLACK_OLIVE, )
+
+#on affiche l’attaque de l’ordi selon le game state et on affiche de la partie 
+
+   def on_update(self, delta_time):
+
+   def on_key_press(self, key, key_modifiers):
+       if (self.game_state == game_state.GameState.NOT_STARTED and key == arcade.key.SPACE):
+           self.game_state = game_state.GameState.ROUND_ACTIVE
+
+#invoqué à chaques fois que le jouer mets une touche du clavier 
+       if arcade.key.SPACE:
+           if self.game_state == Game_State.ROUND_DONE:
+               self.game_state = Game_State.ROUND_ACTIVE
+
+           if self.game_state == Game_State.GAME_OVER:
+               self.setup()
+
+   def reset_round(self):
+ #on recommence les variables modifiés
+       self.computer_attack_type = -1
+       self.player_attack_chosen = False
+       self.player_attack_type = {AttackType.ROCK: False, AttackType.PAPER: False, AttackType.SCISSORS: False}
+       self.player_won_round = False
+       self.draw_round = False
+
+       if (self.game_state == game_state.GameState.ROUND_DONE and key == arcade.key.SPACE):
+           self.game_state = game_state.GameState.ROUND_ACTIVE
+
+   def on_mouse_press(self, x, y, button, key_modifiers):
+
+
+= True
+       pass
+
+
+def main():
+   
+   game = MyGame(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
+   game.setup()
+   arcade.run()
+
+
+if __name__ == "__main__":
+main()
